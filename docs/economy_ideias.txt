@@ -1,0 +1,25 @@
+there should be instalation in the system both orbital and surface
+
+for example
+
+Computer Plant:
+    Needed resources: Chips; Plastic; Metal; Gold; Silicon; Cristals
+    Produces: Computers
+
+Chip Plant:
+    Needed Resources: Lazers; Silicon; etc;
+
+Each plant will have a production formulas example: 1 computer = 0.5 Chips; 1 Plastic; 1 Metal; 0.01 Gold; 1 Silicon; 0.5 Cristals
+So each plant buy resources and sells products: 1 computer (price) = price of resources * margin
+
+Each system will have a resource value multiplier that will calculated from a simulation layer yet to be defined and 
+that multipler will infuence the value at which it's willing to by resources
+
+Example: Gold Average Value = 10 * Supply Multiplier = 1.21 = buy at 12.1
+         The sell price will be calculated based on the resources value.
+
+
+
+
+
+

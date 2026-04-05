@@ -1,0 +1,77 @@
+The system will have an ATC (Air Traffic Controller) named STC (Sector Traffic Controller)
+
+The ATC will direct space ship in the system.
+
+Work Flow of the STC
+
+Init:
+	- Instanciastes the System Object
+        	- Creates and internal representation of system objects to check and issue collision advisories (body radius)
+                - For each station and surface for
+			- Check for station type and loads a station type manifesto that contains the approach final vector and the collision radius 
+	- Receives in system ship manifestos
+		- Ship manifesto includes (ShipId, Call Sign, Turn Capabilities, Acceleration and Deceleration capabilities, Position, IFR or VFR operation, destination and flight plan ir any)
+
+
+Operation:
+
+         - STC radar will operate in an 1Hz frequency
+		- Receives ship update pings at this frequency (via a queue) (the update ping will have direction vectors, speed)
+		- Calculates waypoints according with the flight plan, collisions and traffic
+
+
+Flight plan:
+
+	- A ship will ask STC for a flight plan to a specific destination
+	- The STC will calculate an initial plight plan and assign it to the ship internal STC representation
+	- The flight plan will be composed by Flight Segments (Departure; EnRoute; Approach; CloseFinal)
+		- Departure: the STC will compute a departure path; 
+			- For surface ports it will include a climb to 500meters, a coasting phase of >1Km, a turn away from the planet but in the general direction of the destination but away from nearby bodies
+                        - For space station it will include a coasting phase of >1Km, a turn away from the planet and the station but in the general direction of the destination but away from nearby bodies
+                        - For ships already in space it will include a turn in the general direction of the destination but away from nearby bodies
+
+		- EnRoute: the STC will compute a route path to 500km of the destination including any turns to avoid system bodies and objects
+			- the route will have an acceleration phase a coast phase an a deceleration phase: 
+				- those phases will be aligned with the ship capabilities
+			- Ate the end of this phase the ship should be at a speed of 10MM/s (million meters)
+		- Approach
+			- The STC will calculate an approach route that will take the ship to 10km away from the destination (taking into account obstacles such as stations and planet surfaces)
+                        - At the end of this phase the ship will need to have its speed <500km/h
+                - CloseFinal
+			- The STC will calculate vectors to guide the ship to short final vector
+	- Other phases
+		- ApproachHold: if a ship will get to the Approach start point at more than 10MM/s and will need to be recomputed a ApproachHold to correct the speed
+		- MissedApproach: if a ship will get to the CloseFinal at a speed greater than 500km/h a MissedApproach route will need to be calculated to correct
+
+Route check:
+       - The STC should calculate route deviations (expected vs actual)
+       - The deviation function should check velocity and route
+       - The allowed error for route should be a function that will take into account speed and ship capacilities
+       - The allowed error for speed should have an allowed percentage of error
+
+Phases:
+    - None = 0,
+    - Departure,
+    - EnRoute,
+    - Approach,
+    - ApproachHold,
+    - CloseFinal,
+    - MissedApproach
+
+Orders / Advisories the STC can issue:
+
+    - Turn Left/Right Heading <1 360> (heading is system heading)
+    - Pitch Up/Down Vertical Heading <1 360>  (heading is system heading)
+    - Rotate Left/Right Angle <-180 +180> (used to align the ship with the system plain and help navigation)
+    - Accelerate to XXX Km/h
+    - Decelerate to XXX Km/h
+    - Intercept and follow Station Approach beacon (when delivering ship to approach final vector)
+
+Technical details:
+
+- Keep the code clean
+- Create functions with functionality aligned with the requirements
+- Keep functions small
+- Check the best algorithms to implement route calculations and computation (Catmull-Rom Splines?)
+- Check online literature if needed
+- RF: some phases need to be calculated using the RF (Reference Frame) of the object Body or Station so the velocity should be calculated taking into account the RF of the object.
